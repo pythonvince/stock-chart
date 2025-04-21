@@ -1,0 +1,50 @@
+import yfinance as yf
+import matplotlib.pyplot as plt
+import mplcursors
+import matplotlib.dates as mdates
+
+#Step 1: Choose a stock
+tickers = ["NVDA", "GOOG", "MSFT"]
+start_date = "2020-01-01"
+end_date = "2025-01-01"
+
+plt.figure(figsize=(10, 6))
+
+#Step 2: Fetch historical stock-course
+for ticker in tickers:
+    data = yf.download(ticker, start=start_date, end=end_date)
+
+    if "Adj Close" in data.columns:
+        adj_close = data["Adj Close"]
+
+    else:
+        print("Error: Adj Close column not found, using Close instead.")
+        adj_close = data["Close"]
+
+    data["SMA50"] = data.rolling(window=50).mean()["Close"]
+
+    plt.plot(data.index, data["Close"], label=f'{ticker} Stock Price')
+    plt.plot(data.index, data["SMA50"], label=f'{ticker} 50-Day SMA', linestyle="--")
+    
+cursor = mplcursors.cursor(hover=True)
+
+@cursor.connect("add")
+def on_add(sel):
+    date = sel.target[0]
+    price = sel.target[1]
+    date = mdates.num2date(date)
+    sel.annotation.set_text(f"Date: {date.strftime('%Y-%m-%d')}\nPrice: ${price:.2f}")
+    sel.annotation.get_bbox_patch().set_facecolor('orange')
+    
+
+
+#Step 3: Visualize the stock-course
+
+plt.title("Stock Development with 50-Day SMA")
+plt.xlabel("Date")
+plt.ylabel("Price (USD)")
+plt.grid(True)
+plt.legend()
+plt.xticks(rotation=45) #Rotates the date for better readability
+plt.tight_layout()
+plt.show()
