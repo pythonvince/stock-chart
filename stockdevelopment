@@ -6,7 +6,7 @@ import matplotlib.dates as mdates
 #Step 1: Choose a stock
 tickers = ["NVDA", "GOOG", "MSFT"]
 start_date = "2020-01-01"
-end_date = "2025-01-01"
+end_date = "2025-04-22"
 
 plt.figure(figsize=(10, 6))
 
